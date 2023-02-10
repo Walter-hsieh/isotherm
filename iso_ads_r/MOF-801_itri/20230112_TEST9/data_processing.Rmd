@@ -1,0 +1,150 @@
+---
+title: "MOF-801 Adsorption Isotherm of Water"
+author: "T.L. Hsieh"
+date: "`r Sys.Date()`"
+output:
+  pdf_document: default
+  html_document: default
+  word_document: default
+always_allow_html: yes
+---
+
+```{r setup, include=FALSE}
+install.packages("tidyverse", repos = "http://cran.us.r-project.org")
+install.packages("ggplot2", repos = "http://cran.us.r-project.org")
+install.packages("readxl", repos = "http://cran.us.r-project.org")
+install.packages("plotly", repos = "http://cran.us.r-project.org")
+install.packages("webshot", repos = "http://cran.us.r-project.org")
+
+library(tidyverse)
+library(ggplot2)
+library(readxl)
+library(plotly)
+```
+
+### view the dataset with table and plot
+```{r quick inview before data clean}
+dataset <- read_excel("dataset.xlsx")
+colnames(dataset)
+
+head(dataset)
+
+p <- ggplot(data=dataset)+
+  geom_point(mapping=aes(x=time_s/3600, y=uptake*100,,color='uptake'))+
+  geom_point(mapping=aes(x=time_s/3600, y=hpv, color='humidity'))+
+  ylab("water uptake/ humidity")+
+  xlab('time (hr)')+
+  theme_test()
+
+p
+
+ggplotly(p)
+```
+
+
+### Convert excel file to csv
+```{r read data}
+df_excel <- read_excel("dataset.xlsx")
+write.csv(df_excel, "dataset.csv")
+```
+Sometimes, R is having problem with .xlsx file when plotting, so it is better to convert xlsx to csv file, which will save you among of time in a long run.
+
+
+### Clean Data: reomve unwanted data points
+```{r clean data}
+df_csv <- read.csv("dataset.csv")
+colnames(df_csv)
+
+# data clean
+df_clean <- df_csv %>% filter(time_s/3600>=3) %>% 
+  filter(!((time_s/3600 >= 5.267 & time_s/3600 <= 5.359) & (hpv >= 14.80 & hpv <= 20.28)))
+```
+
+Here we use pipe operator (%>%) to clean the data. First, we use filter function to extract the data with 'time_s/3600' greater than 3, which means only the data collected after 3 hours of measurement will be included. Second, we remove the points with the time within 5.267 to 5.359 hours and the hpv (humidity) between 14.80 to 20.28 because it will affect the accuracy of the finally result. Finally, we checked the cleaned data by visualizing it.
+
+```{r plot after data cleaning, echo=TRUE}
+p1 <- ggplot(data=df_clean)+
+  geom_point(mapping=aes(x=time_s/3600, y=uptake*100, color='uptake'))+
+  geom_point(mapping=aes(x=time_s/3600, y=hpv, color='hpv'))+
+  ylim(0, 100)+
+  labs(x="time (min)", y="uptake/ humidity")+
+  theme_bw()
+
+p1
+
+ggplotly(p1)
+```
+
+### plot: water uptake vs humidity
+```{r Water uptake vs Humidity}
+p2 <- ggplot(data=df_clean)+
+  geom_point(mapping=aes(x=hpv, y=uptake*100, color='uptake'))+
+  labs(x="Humidity (%RH)", y="water uptake (wt.%)")+
+  theme_bw()
+
+p2
+
+ggplotly(p2)
+
+```
+With the plot above we can easily type down the maximum water uptake of the test material at certain humidity. For example, the maximum water uptake at humidity around 10 %RH will be 24.653 wt.%. After collecting all the maximum uptake at the humidity we want to include, we can save the data set as .csv file and make the adsorption isotherm plot (shown below).   
+
+```{r select data point manually, echo=TRUE}
+humidity = c(9.50, 19.62, 29.95, 40.18, 50.33,63.30,70.02,80.05,89.91)
+water_uptake = c(24.653,30.923, 32.788, 33.576, 34.211,34.865,35.230,35.903,37.615)
+
+point_pick = data.frame(humidity, water_uptake)
+write.csv(point_pick, 'point_pick.csv', row.names = FALSE)
+
+
+p3 <- ggplot(data=point_pick, mapping=aes(x=humidity, y=water_uptake, color='uptake'))+
+  geom_point()+
+  geom_smooth(se=FALSE)+
+  labs(x="humidity (%RH)", y="uptake (wt.%)")+
+  xlim(0,100)+
+  theme_bw()
+
+p3
+ggplotly(p3)
+
+```
+
+
+### Group the data by humidity
+Another way to process the data is to group the data by humidity. First we use mutate function to add extra column named "hpv_1" with data that round of hpv to first decimal. Second we group the whole data by hpv_1 and use summarise function to calculate the maximum and mean value of the water uptake.  
+```{r group data by humidity}
+
+df_group <- df_clean %>% 
+  mutate(hpv_1 = round(hpv,1)) %>% 
+  group_by(hpv_1) %>% 
+  summarise(uptake_max = max(uptake), uptake_mean = mean(uptake))
+
+```
+
+### Plot with smooth line
+Finally, we plot the df_group data by hpv_1 and uptake, and add smooth line to the plot (as shown below).
+```{r smooth plot}
+p4 <- ggplot(data=df_group)+
+  geom_point(mapping=aes(x=hpv_1, y=uptake_mean*100))+
+  geom_smooth(mapping=aes(x=hpv_1, y=uptake_mean*100))+
+  ylab('water uptake (wt.%)')+
+  xlab('humidity (%RH)')+
+  xlim(0,100)+
+  theme_test()
+
+p4
+
+ggplotly(p4)
+```
+
+The figure above shows that the material adsorbs water as the increase of humidity. 
+
+### save final result
+```{r save processed data as csv}
+
+df_dropna <- drop_na(df_group)
+write.csv(df_group, "result_r.csv", row.names = FALSE)
+```
+
+
+

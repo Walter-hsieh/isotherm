@@ -1,0 +1,11 @@
+name: Publish Document
+title:
+username:
+account: rpubs
+server: rpubs.com
+hostUrl: rpubs.com
+appId: https://api.rpubs.com/api/v1/document/992998/22491c68f22041de9e30c46932d0e77b
+bundleId: https://api.rpubs.com/api/v1/document/992998/22491c68f22041de9e30c46932d0e77b
+url: http://rpubs.com/TsungLinHsieh/992998
+when: 1674036684.56061
+lastSyncTime: 1674036684.56062

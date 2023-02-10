@@ -1,0 +1,1 @@
+"C:\Program Files\Python38\python.exe" "C:\Users\A70459\Documents\my_r_projects\iso_des_r\iso_des_summary\iso_des.py"
