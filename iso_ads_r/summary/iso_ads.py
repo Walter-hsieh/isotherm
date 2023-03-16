@@ -5,7 +5,7 @@ import matplotlib.colors as mcolors
 colors = mcolors.TABLEAU_COLORS
 color_list = list(colors.values())
 
-df = pd.read_excel("iso_ads_point.xlsx")
+df = pd.read_excel("iso_ads_point_copy.xlsx")
 
 # print(df)
 colnames = df.columns
@@ -21,7 +21,7 @@ ax.plot(df[colnames[0]], df[colnames[1]]*100, label=colnames[1], color = color_l
 ax.plot(df[colnames[2]], df[colnames[3]]*100, label=colnames[3], color = color_list[1], marker=markers[1], linewidth=1, alpha=0.8)
 ax.plot(df[colnames[4]], df[colnames[5]]*100, label=colnames[5], color = color_list[2], marker=markers[2], linewidth=1, alpha=0.8)
 ax.plot(df[colnames[6]], df[colnames[7]]*100, label=colnames[7], color = color_list[3], marker=markers[3], linewidth=1, alpha=0.8)
-ax.plot(df[colnames[8]], df[colnames[9]]*100, label=colnames[9], color = color_list[4], marker=markers[4], linewidth=1, alpha=0.8)
+# ax.plot(df[colnames[8]], df[colnames[9]]*100, label=colnames[9], color = color_list[4], marker=markers[4], linewidth=1, alpha=0.8)
 # ax.plot(df[colnames[10]], df[colnames[11]]*100, label=colnames[11], color = color_list[5], marker=markers[5], linewidth=1, alpha=0.8)
 # ax.plot(df[colnames[12]], df[colnames[13]]*100, label=colnames[13], color = color_list[6], marker=markers[6], linewidth=1, alpha=0.8)
 ax.legend(loc=2, fontsize=10)
@@ -29,7 +29,7 @@ ax.set_title("Adsorption Isotherm of water")
 plt.xlim([0, 100])
 plt.ylim([0, 100])
 # plt.savefig('result_continuous.png', dpi=1000)
-plt.savefig('Isotherm_MOFs.png', dpi=1000)
+plt.savefig('Isotherm_MOFs_public.png', dpi=1000)
 # plt.savefig('Adsorption Isotherm_Filtech.png', dpi=1000)
 # plt.show()
 print("process completed")
